@@ -3,18 +3,30 @@ import React, { Component, PropTypes } from 'react';
 import EditorToolbar from './components/EditorToolbar';
 import FabricCanvas from './components/FabricCanvas';
 import getFabric from '../fabric';
+import { SketchPicker } from 'react-color';
 
 class Editor extends Component {
   fabric = null
   createCanvas = ref => {
-    console.log('height: ', ref.height);
-    console.log('width: ', ref.width);
+    if (ref && !this.fabric){
+      console.log('height: ', ref.height);
+      console.log('width: ', ref.width);
 
-    console.warn('need to figure out how to properly set height/width');
-    this.fabric = getFabric(ref, 500, 500);
-    window.f = this.fabric;
+      console.warn('need to figure out how to properly set height/width');
+      this.fabric = getFabric(ref, 500, 500);
+      window.f = this.fabric;
+    }
+  };
+  state = {
+    background: '#fff',
   };
 
+  handleChangeComplete = (color) => {
+    window.c = color;
+
+    this.fabric.setPenColor(color.hex);
+    this.setState({ background: color.hex })
+  };
   render(){
 
     return (
@@ -44,6 +56,12 @@ class Editor extends Component {
 
           }}
         />
+        <div style={{ position: 'absolute', left: 0, bottom: 0 }}>
+          <SketchPicker
+            color={ this.state.background }
+            onChangeComplete={ this.handleChangeComplete }
+          />
+        </div>
       </div>
     )
   }

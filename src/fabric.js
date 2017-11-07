@@ -88,6 +88,9 @@ export default (canvasRef, height, width) => {
         updateText(canvas, fabricText, newData);
       });
     },
+    setPenColor : color => {
+      canvas.freeDrawingBrush.color = color;
+    }
 
   };
 };
