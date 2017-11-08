@@ -2,8 +2,10 @@
 import React, { Component, PropTypes } from 'react';
 import EditorToolbar from './components/EditorToolbar';
 import FabricCanvas from './components/FabricCanvas';
-import getFabric from '../fabric';
+import getMqttFabric from './util/mqttFabric/mqttFabric';
 import { SketchPicker } from 'react-color';
+
+const mqttBrokerURL =`http://127.0.0.1:4000`;
 
 class Editor extends Component {
   fabric = null
@@ -13,7 +15,7 @@ class Editor extends Component {
       console.log('width: ', ref.width);
 
       console.warn('need to figure out how to properly set height/width');
-      this.fabric = getFabric(ref, 500, 500);
+      this.fabric = getMqttFabric(mqttBrokerURL, ref, 500, 500);
       window.f = this.fabric;
     }
   };
@@ -22,9 +24,8 @@ class Editor extends Component {
   };
 
   handleChangeComplete = (color) => {
-    window.c = color;
 
-    this.fabric.setPenColor(color.hex);
+    this.fabric.onChangeColor(color.hex);
     this.setState({ background: color.hex })
   };
   render(){
@@ -45,7 +46,10 @@ class Editor extends Component {
             this.fabric.stopFree();
           }}
           onAddSubscription={topic => {
-            this.fabric.createSubscription(topic);
+            this.fabric.addMqttText(topic);
+          }}
+          onAddRectSubscription={topic =>  {
+            this.fabric.addMqttRect(topic);
           }}
         />
         <FabricCanvas

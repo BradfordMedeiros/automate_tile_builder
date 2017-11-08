@@ -6,6 +6,7 @@ import TextField from 'material-ui/TextField';
 class EditorToolbar extends Component {
   state = {
     text: '',
+    addType: 'rect',
   }
   render() {
     const {
@@ -15,6 +16,7 @@ class EditorToolbar extends Component {
       onSetObjectMode,
       onDeleteSelected,
       onAddSubscription,
+      onAddRectSubscription,
     } = this.props;
     return (
       <div style={{
@@ -27,12 +29,33 @@ class EditorToolbar extends Component {
         justifyContent: 'center',
       }}>
         <div style={{ display: 'flex' }}>
-          <FlatButton onClick={onAddRect} label="Add Rect" />
           <FlatButton
-            primary
+            primary={this.state.addType === 'rect'}
+            onClick={() => {
+              this.setState({
+                addType: 'rect',
+              });
+            }}
+            label="Add Rect"
+          />
+          <FlatButton
+            primary={this.state.addType === 'text'}
             label="Add Text"
             onClick={() => {
-              onAddText(this.state.text)
+              this.setState({
+                addType: 'text',
+              });
+            }}
+          />
+          <RaisedButton
+            secondary
+            label="Add"
+            onClick={() => {
+              if (this.state.addType === 'text'){
+                onAddText(this.state.text);
+              }else if (this.state.addType === 'rect'){
+                onAddRect();
+              }
             }}
           />
           <TextField
@@ -46,9 +69,13 @@ class EditorToolbar extends Component {
           />
           <RaisedButton
             primary
-            label="Add Subscription"
+            label="Add With Subscription"
             onClick={() => {
-              onAddSubscription(this.state.text)
+              if (this.state.addType === 'text'){
+                onAddSubscription(this.state.text)
+              }else if (this.state.addType === 'rect'){
+                onAddRectSubscription(this.state.text);
+              }
             }}
           />
           <FlatButton onClick={onSetDrawingMode} label="Set Drawing Mode" />
@@ -67,6 +94,7 @@ EditorToolbar.propTypes = {
   onSetObjectMode: PropTypes.func,
   onDeleteSelected: PropTypes.func,
   onAddSubscription: PropTypes.func,
+  onAddRectSubscription: PropTypes.func,
 };
 
 export default EditorToolbar;
