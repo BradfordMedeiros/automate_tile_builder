@@ -1,10 +1,10 @@
 import React, { PropTypes, Component } from 'react';
-import MqttConfig from './components/MqttConfig';
+import MqttConfig from './components/MqttConfig/MqttConfig';
 
 class FabricCanvas extends Component {
   render() {
 
-    const { onCanvasRef } = this.props;
+    const { onCanvasRef, onApplyMqttSettings } = this.props;
     return (
       <div style={{
         height: 'calc(70% - 80px)',
@@ -23,7 +23,12 @@ class FabricCanvas extends Component {
             style={{ height: '100%', width: 500, height: 500, border: '1px solid white' }}
           />
         </div>
-        <MqttConfig />
+        <MqttConfig
+          stateMqttValue={'test'}
+          stateCondition={'>'}
+          stateMqttTopic={'30'}
+          onApply={onApplyMqttSettings}
+        />
       </div>
     );
   }
@@ -31,6 +36,7 @@ class FabricCanvas extends Component {
 
 FabricCanvas.propTypes = {
   onCanvasRef: PropTypes.func, // probably need a component unmount thing to
+  onApplyMqttSettings: PropTypes.func,
 };
 
 export default FabricCanvas;

@@ -1,10 +1,11 @@
 import getFabric from './util/fabric';
 import getMqttManager from './util/mqttManager';
 
-const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width) => {
-  const fabricCustom = getFabric(canvasRef, height, width);
-
-  window.fc = fabricCustom;
+const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
+  onElementSelected,
+  onGroupSelected,
+} = {}) => {
+  const fabricCustom = getFabric(canvasRef, height, width, { onElementSelected });
   const mqttManager = getMqttManager(mqttBrokerUrl);
 
   return ({
@@ -28,8 +29,6 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width) => {
       const rectFabric = fabricCustom.addRect();
 
       const onMqttData = newData => {
-        console.log('mqtt data got data');
-        //updateText(newData);
         if (newData !== 'cool'){
           rectFabric.set({
             opacity: 0,
@@ -51,10 +50,10 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width) => {
 
 
 /*
- createSubscription: mqttTopic => {
- const fabricText = getText(mqttTopic, selectedColor);
+ createSubscription: stateMqttTopic => {
+ const fabricText = getText(stateMqttTopic, selectedColor);
  canvas.add(fabricText);
- return mqttSubscribe(mqttTopic, newData =>  {
+ return mqttSubscribe(stateMqttTopic, newData =>  {
  updateText(canvas, fabricText, newData);
  });
  },

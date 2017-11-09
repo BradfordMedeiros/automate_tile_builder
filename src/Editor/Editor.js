@@ -9,14 +9,20 @@ const mqttBrokerURL =`http://127.0.0.1:4000`;
 
 class Editor extends Component {
   fabric = null
+  selectedElement = null;
   createCanvas = ref => {
     if (ref && !this.fabric){
       console.log('height: ', ref.height);
       console.log('width: ', ref.width);
 
       console.warn('need to figure out how to properly set height/width');
-      this.fabric = getMqttFabric(mqttBrokerURL, ref, 500, 500);
-      window.f = this.fabric;
+      this.fabric = getMqttFabric(mqttBrokerURL, ref, 500, 500, {
+        onElementSelected:  (selectedElement, id) => {
+          console.log('selected: ', id);
+          this.selectedElement = selectedElement;
+          window.s = selectedElement;
+        }
+      });
     }
   };
   state = {
@@ -53,6 +59,18 @@ class Editor extends Component {
           }}
         />
         <FabricCanvas
+          selectedElement={{ // this is mock data
+            id: 2,
+            mqttSettings: {
+              topic: 'test',
+              value: 'some value',
+              condition:  '==',
+            }
+          }}
+          onApplyMqttSettings={settings => {
+            console.log('apply new mqtt settings');
+            console.log(settings);
+          }}
           onCanvasRef={ref => {
             window.r = ref;
             window.fabric = fabric;

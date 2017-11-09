@@ -1,5 +1,7 @@
 import { fabric } from 'fabric';
 
+let id = 0; // maybe use uuid?
+
 const createCanvas = (canvasRef, height = 500, width = 500) => {
   const canvas = new fabric.Canvas(canvasRef);
   canvas.setDimensions({ height, width });
@@ -14,6 +16,7 @@ const getRect = color => {
     height : 70,
     fill : color,
   });
+
   return rect;
 };
 
@@ -41,7 +44,9 @@ const stopFreeDrawMode = canvas => {
 };
 
 
-export default (canvasRef, height, width) => {
+export default (canvasRef, height, width, {
+  onElementSelected,
+}) => {
   const canvas = createCanvas(canvasRef, height, width);
 
   let selectedObject = null;
@@ -49,7 +54,48 @@ export default (canvasRef, height, width) => {
   canvas.on('object:selected', event => {
     console.log('object selected!');
     selectedObject = event.target;
+    if(onElementSelected){
+      if (selectedObject !== null && (selectedObject.id === undefined)){
+        throw (new Error('selected object does not have an id.  This should never happen'));
+      }
+      onElementSelected(selectedObject, (selectedObject ? selectedObject.id: undefined));
+    }
   });
+
+  canvas.on('before:selection:cleared', function() {
+    console.log('deslected!!!!!!!!')
+    onElementSelected(null);
+  });
+
+  canvas.on('object:added', event => {
+    console.log('object added!');
+    const object = event.target;
+    object.id = id;
+    id = id + 1;
+    window.o = object;
+  });
+
+
+  // this prevents moving objects out  of the canvas, and it may be good to include, but i kind of prefer a less intrusive
+  // way of dealing with this.  how about "clean objects out of bounds?
+  /*canvas.on('object:moving', function (e) {
+    let obj = e.target;
+    // if object is too big ignore
+    if(obj.currentHeight > obj.canvas.height || obj.currentWidth > obj.canvas.width){
+      return;
+    }
+    obj.setCoords();
+    // top-left  corner
+    if(obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0){
+      obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top);
+      obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left);
+    }
+    // bot-right corner
+    if(obj.getBoundingRect().top+obj.getBoundingRect().height  > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width  > obj.canvas.width){
+      obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
+      obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
+    }
+  });*/
 
   return {
     canvas,
