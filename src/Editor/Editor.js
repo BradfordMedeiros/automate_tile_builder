@@ -1,7 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import EditorToolbar from './components/EditorToolbar';
-import FabricCanvas from './components/FabricCanvas';
+import FabricCanvas from './components/FabricCanvas/FabricCanvas';
 import getMqttFabric from './util/mqttFabric/mqttFabric';
 import { SketchPicker } from 'react-color';
 

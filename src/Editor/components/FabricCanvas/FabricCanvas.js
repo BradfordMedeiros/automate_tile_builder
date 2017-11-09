@@ -1,4 +1,5 @@
 import React, { PropTypes, Component } from 'react';
+import MqttConfig from './components/MqttConfig';
 
 class FabricCanvas extends Component {
   render() {
@@ -22,6 +23,7 @@ class FabricCanvas extends Component {
             style={{ height: '100%', width: 500, height: 500, border: '1px solid white' }}
           />
         </div>
+        <MqttConfig />
       </div>
     );
   }
