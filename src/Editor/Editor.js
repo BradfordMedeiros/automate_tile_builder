@@ -7,34 +7,48 @@ import { SketchPicker } from 'react-color';
 
 const mqttBrokerURL =`http://127.0.0.1:4000`;
 
-class Editor extends Component {
-  fabric = null
-  selectedElement = null;
-  createCanvas = ref => {
-    if (ref && !this.fabric){
-      console.log('height: ', ref.height);
-      console.log('width: ', ref.width);
+/*
+  information: {
+    type: text, or other
+    removeSubscription (call when want to get rid of it)
+    if text:
 
-      console.warn('need to figure out how to properly set height/width');
-      this.fabric = getMqttFabric(mqttBrokerURL, ref, 500, 500, {
-        onElementSelected:  (selectedElement, id) => {
-          console.log('selected: ', id);
-          this.selectedElement = selectedElement;
-          window.s = selectedElement;
-        }
-      });
-    }
-  };
+    if other:
+    topic,
+    condition,
+    value,
+
+  }
+
+ */
+
+class Editor extends Component {
+  fabric = null;
+  selectedElement = null;
   state = {
     background: '#fff',
   };
-
   handleChangeComplete = (color) => {
-
     this.fabric.onChangeColor(color.hex);
     this.setState({ background: color.hex })
   };
+  onElementSelected  =  (selectedElement, id) => {
+    this.selectedElement = selectedElement;
+    if (selectedElement){
+      const information = this.fabric.getMqttInformation(selectedElement);
+      this.setState({
+        information,
+      });
+    }
+  };
+  createCanvas = ref => {
+    if (ref && !this.fabric) {
+      console.warn('need to figure out how to properly set height/width');
+      this.fabric = getMqttFabric(mqttBrokerURL, ref, 500, 500, {onElementSelected: this.onElementSelected});
+    }
+  }
   render(){
+    const { information } = this.state;
 
     return (
       <div style={{ position: 'absolute', width: '100%', height: '100%' }}>
@@ -59,23 +73,13 @@ class Editor extends Component {
           }}
         />
         <FabricCanvas
-          selectedElement={{ // this is mock data
-            id: 2,
-            mqttSettings: {
-              topic: 'test',
-              value: 'some value',
-              condition:  '==',
-            }
-          }}
-          onApplyMqttSettings={settings => {
-            console.log('apply new mqtt settings');
-            console.log(settings);
+          selectedElement={information}
+          onApplyMqttSettings={({ topic, condition, value }) => {
+
+            this.fabric.updateMqttRect(this.selectedElement, topic, condition, value);
           }}
           onCanvasRef={ref => {
-            window.r = ref;
-            window.fabric = fabric;
             this.createCanvas(ref);
-
           }}
         />
         <div style={{ position: 'absolute', left: 0, bottom: 0 }}>

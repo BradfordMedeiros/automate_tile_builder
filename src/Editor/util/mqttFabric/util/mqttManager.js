@@ -1,6 +1,5 @@
 const mqtt = require('mqtt');
 
-
 const getMqttManager = mqttUrl => {
 
   const mqttSubscribe = (topic, onData) => {

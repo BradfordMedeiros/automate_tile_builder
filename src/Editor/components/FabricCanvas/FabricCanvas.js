@@ -4,7 +4,15 @@ import MqttConfig from './components/MqttConfig/MqttConfig';
 class FabricCanvas extends Component {
   render() {
 
-    const { onCanvasRef, onApplyMqttSettings } = this.props;
+    const { onCanvasRef, onApplyMqttSettings, selectedElement } = this.props;
+    window.se = selectedElement;
+
+    const type = selectedElement  && selectedElement.type;
+
+    if (type !== 'object'){
+      console.warn('only object type currently supported in this component');
+    }
+
     return (
       <div style={{
         height: 'calc(70% - 80px)',
@@ -23,12 +31,14 @@ class FabricCanvas extends Component {
             style={{ height: '100%', width: 500, height: 500, border: '1px solid white' }}
           />
         </div>
-        <MqttConfig
-          stateMqttValue={'test'}
-          stateCondition={'>'}
-          stateMqttTopic={'30'}
-          onApply={onApplyMqttSettings}
-        />
+        {type === 'object' && (
+          <MqttConfig
+            stateMqttValue={'test'}
+            stateCondition={selectedElement.condition}
+            stateMqttTopic={selectedElement.topic}
+            onApply={onApplyMqttSettings}
+          />
+        )}
       </div>
     );
   }
@@ -37,6 +47,7 @@ class FabricCanvas extends Component {
 FabricCanvas.propTypes = {
   onCanvasRef: PropTypes.func, // probably need a component unmount thing to
   onApplyMqttSettings: PropTypes.func,
+  selectedElement: PropTypes.object,
 };
 
 export default FabricCanvas;

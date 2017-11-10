@@ -3,6 +3,12 @@ import FlatButton from 'material-ui/FlatButton';
 import State from './components/State';
 import Click from './components/Click';
 
+const styles = {
+  outer: { padding: 18, border: '1px solid black', display: 'flex',  flexDirection: 'column' },
+  holder: { display: 'flex',  justifyContent: 'space-evenly', color: 'whitesmoke', borderBottom: '1px solid rgb(30,30,30)' },
+  selected: (menu, type) => ({ cursor: 'pointer', color: menu === type ? 'blue': undefined }),
+};
+
 class MqttConfig extends Component {
   state = {
     stateMqttTopic: null,
@@ -43,15 +49,10 @@ class MqttConfig extends Component {
   };
   render() {
     return (
-      <div style={{ padding: 18, border: '1px solid black', display: 'flex',  flexDirection: 'column' }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          color: 'whitesmoke',
-          borderBottom: '1px solid rgb(30,30,30)',
-        }}>
-          <div style={{ cursor: 'pointer', color: this.state.menu === 'state' ? 'blue': undefined }}  onClick={() => { this.setState({ menu: 'state' }); }}>State</div>
-          <div style={{ cursor: 'pointer', color: this.state.menu === 'click' ? 'blue': undefined }}  onClick={() => { this.setState({ menu: 'click' }); }}>Click</div>
+      <div style={styles.outer}>
+        <div style={styles.holder}>
+          <div style={styles.selected(this.state.menu,'state')}  onClick={() => { this.setState({ menu: 'state' }); }}>State</div>
+          <div style={styles.selected(this.state.menu,'click')}  onClick={() => { this.setState({ menu: 'click' }); }}>Click</div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>

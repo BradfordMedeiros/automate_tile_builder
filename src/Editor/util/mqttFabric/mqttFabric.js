@@ -1,6 +1,8 @@
 import getFabric from './util/fabric';
 import getMqttManager from './util/mqttManager';
 
+const mqttDataManager = { };
+
 const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
   onElementSelected,
   onGroupSelected,
@@ -16,6 +18,9 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
     addText: fabricCustom.addText,
     setFree: fabricCustom.setFree,
     stopFree: fabricCustom.stopFree,
+    getMqttInformation : element =>  {
+      return mqttDataManager[element.id];
+    },
     addMqttText: topic => {
       const updateText = fabricCustom.addText(topic);
 
@@ -23,7 +28,20 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
         updateText(newData);
       };
       const { removeSubscription } =  mqttManager.addSubscription(topic, onMqttData);
+      mqttDataManager[updateText.id] = {
+        type: 'text',
+        removeSubscription,
+        topic,
+      }
     },
+    updateMqttText: () => {
+      console.error('not yet implemented');
+    },
+    deleteMqttText: () => {
+      console.error('not yet implemented');
+    },
+
+
     // condition: { operator: oneOf( >,<,=,! ), value=<any string>}
     addMqttRect: (topic, condition) => {
       const rectFabric = fabricCustom.addRect();
@@ -44,7 +62,23 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
         }
       };
       const { removeSubscription } =  mqttManager.addSubscription(topic, onMqttData);
+      mqttDataManager[rectFabric.id] = {
+        type: 'object',
+        removeSubscription,
+        topic,
+        condition,
+      };
     },
+    updateMqttRect: (selectedElement, topic, condition, value) => {
+      console.log('updating mqtt rect');
+      console.log('-- mqtt  rect id is: ', selectedElement.id);
+      console.log('new toppic: ', topic);
+      console.log('new condition: ', condition);
+      console.log('new value: ', value);
+    },
+    deleteMqttRect: () => {
+      console.error('not yet impllemented');
+    }
   });
 }
 
