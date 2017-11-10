@@ -43,7 +43,7 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
 
 
     // condition: { operator: oneOf( >,<,=,! ), value=<any string>}
-    addMqttRect: (topic, condition) => {
+    addMqttRect: (topic, condition, value) => {
       const rectFabric = fabricCustom.addRect();
 
       const onMqttData = newData => {
@@ -61,10 +61,11 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
           fabricCustom.canvas.renderAll();
         }
       };
-      const { removeSubscription } =  mqttManager.addSubscription(topic, onMqttData);
+      const { removeSubscription, updateSubscription } =  mqttManager.addSubscription(topic, onMqttData);
       mqttDataManager[rectFabric.id] = {
         type: 'object',
         removeSubscription,
+        updateSubscription,
         topic,
         condition,
       };
@@ -75,6 +76,16 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
       console.log('new toppic: ', topic);
       console.log('new condition: ', condition);
       console.log('new value: ', value);
+
+      const elementId = selectedElement.id;
+      const managedItem = mqttDataManager[elementId];
+      if (managedItem.updateSubscription){
+        managedItem.updateSubscription(topic);
+        console.log('yay update sub!');
+      }else{
+        console.error('for now not going to update rect that istn an mqtt rect');
+      }
+
     },
     deleteMqttRect: () => {
       console.error('not yet impllemented');

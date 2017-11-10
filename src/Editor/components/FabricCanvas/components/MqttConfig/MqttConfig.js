@@ -42,9 +42,9 @@ class MqttConfig extends Component {
   canApply = () => (this.state.stateMqttTopic !== null || this.state.stateMqttValue !== null || this.state.stateCondition !== null);
   handleApply = () => {
     this.props.onApply({
-      topic: this.state.stateMqttTopic,
-      value: this.state.stateMqttValue,
-      condition: this.state.stateCondition,
+      topic: this.state.stateMqttTopic === null ? this.props.stateMqttTopic: this.state.stateMqttTopic,
+      value: this.state.stateMqttValue === null ? this.props.stateMqttValue: this.state.stateMqttValue,
+      condition: this.state.stateCondition === null ? this.props.stateCondition: this.state.stateCondition,
     });
   };
   render() {
@@ -65,13 +65,13 @@ class MqttConfig extends Component {
                     stateCondition,
                   });
                 }}
-                mqttTopic={this.state.stateMqttTopic || this.props.stateMqttTopic}
+                mqttTopic={this.state.stateMqttTopic === null ? this.props.stateMqttTopic: this.state.stateMqttTopic}
                 onMqttTopic={stateMqttTopic => {
                   this.setState({
                     stateMqttTopic,
                   });
                 }}
-                mqttValue={this.state.stateMqttValue || this.props.stateMqttValue}
+                mqttValue={this.state.stateMqttValue === null ?  this.props.stateMqttValue: this.state.stateMqttValue}
                 onMqttValue={(stateMqttValue) => {
                   this.setState({
                     stateMqttValue,

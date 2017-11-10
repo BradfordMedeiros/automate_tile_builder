@@ -19,7 +19,23 @@ const getMqttManager = mqttUrl => {
       onData(message.toString());
     });
 
+    let topicSubscribed = topic;
     return ({
+      updateSubscription: newTopic => {
+        client.unsubscribe(topicSubscribed, err =>  {
+          if(err){
+            console.error(err);
+          }
+
+          client.subscribe(newTopic, err => {
+            if (err){
+              console.error(err);
+            }else{
+              topicSubscribed = newTopic;
+            }
+          });
+        });
+      },
       removeSubscription: () => client.end(),
     })
   };
