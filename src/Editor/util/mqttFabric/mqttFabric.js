@@ -43,31 +43,74 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
 
 
     // condition: { operator: oneOf( >,<,=,! ), value=<any string>}
-    addMqttRect: (topic, condition, value) => {
+    addMqttRect: (topic, initialCondition, initialValue) => {
       const rectFabric = fabricCustom.addRect();
 
-      const onMqttData = newData => {
-        if (newData !== 'cool'){
-          rectFabric.set({
-            opacity: 0,
-            selectable: false
-          })
-          fabricCustom.canvas.renderAll();
-        }else{
-          rectFabric.set({
-            opacity: 1,
-            selectable: true
-          })
-          fabricCustom.canvas.renderAll();
-        }
+      const show= () => {
+        console.log('show!');
+        rectFabric.set({
+          opacity: 1,
+          selectable: true,
+        })
+        fabricCustom.canvas.renderAll();
       };
+      const hide = () => {
+        console.log('hide!');
+        rectFabric.set({
+          opacity: 0,
+          selectable: false,
+        })
+        fabricCustom.canvas.renderAll();
+
+      };
+
+
+      const onMqttData = newData => {
+        const mqttObject = mqttDataManager[rectFabric.id];
+        const condition = mqttObject.condition;
+        const value = mqttObject.value;
+
+        console.log('got data: ', newData);
+        console.log('condition is: ', condition);
+        console.log('value is: ', value);
+
+        if (condition === '==') {
+          if (newData === value) {
+            show();
+          } else {
+            hide();
+          }
+        } else if (condition === '>') {
+          if (newData > value) {
+            show();
+          } else {
+            hide();
+          }
+        } else if (condition === '<') {
+          if (newData < value) {
+            show();
+          } else {
+            hide();
+          }
+        } else if (condition === '!=') {
+          if (newData !== value) {
+            show();
+          } else {
+            hide();
+          }
+        } else {
+          show();
+        }
+      }
+
       const { removeSubscription, updateSubscription } =  mqttManager.addSubscription(topic, onMqttData);
       mqttDataManager[rectFabric.id] = {
         type: 'object',
         removeSubscription,
         updateSubscription,
         topic,
-        condition,
+        condition: initialCondition,
+        value: initialValue,
       };
     },
     updateMqttRect: (selectedElement, topic, condition, value) => {
@@ -81,6 +124,9 @@ const getMqttFabric = (mqttBrokerUrl, canvasRef, height, width, {
       const managedItem = mqttDataManager[elementId];
       if (managedItem.updateSubscription){
         managedItem.updateSubscription(topic);
+        managedItem.topic = topic;
+        managedItem.condition = condition;
+        managedItem.value = value;
         console.log('yay update sub!');
       }else{
         console.error('for now not going to update rect that istn an mqtt rect');
